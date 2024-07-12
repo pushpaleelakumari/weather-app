@@ -37,29 +37,29 @@ function Dashboard() {
         handleGetFavrots();
     }, [user?.id, dispatch]);
 
-    useEffect(() => {
-        const handleSearch = async () => {
-            console.log(search, 'hello search');
-            try {
-                const response = await axios.get(
-                    `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search || user?.cityName)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`
-                );
+    const handleSearch = async () => {
+        console.log(search, 'hello search');
+        try {
+            const response = await axios.get(
+                `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search || user?.cityName)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`
+            );
 
-                if (response.status === 200 && response.data) {
-                    toast.success('Got the current weather data');
-                    setWeatherData(response.data);
-                    showSpinner(false);
-                } else {
-                    toast.error('Failed to fetch weather data');
-                    showSpinner(false);
-                }
-            } catch (err) {
-                console.error('Error fetching weather data:', err);
-                toast.error('Please provide a valid city name');
+            if (response.status === 200 && response.data) {
+                toast.success('Got the current weather data');
+                setWeatherData(response.data);
+                showSpinner(false);
+            } else {
+                toast.error('Failed to fetch weather data');
                 showSpinner(false);
             }
-        };
+        } catch (err) {
+            console.error('Error fetching weather data:', err);
+            toast.error('Please provide a valid city name');
+            showSpinner(false);
+        }
+    };
 
+    useEffect(() => {
         showSpinner(true);
         setTimeout(() => {
             if (user?.cityName) handleSearch();
