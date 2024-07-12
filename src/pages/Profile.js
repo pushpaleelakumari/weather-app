@@ -51,7 +51,7 @@ function Profile() {
 
     useEffect(() => {
         handleGetData();
-    }, [user, handleGetData]);
+    }, [user]);
 
     return (
         <section className='bg-dark text-light d-flex align-items-center' style={{ height: '90vh', width: '100%' }}>
