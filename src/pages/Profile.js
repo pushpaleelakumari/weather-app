@@ -10,7 +10,8 @@ function Profile() {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        id: ''
+        id: '',
+        city: ''
     });
 
     useEffect(() => {
@@ -18,7 +19,8 @@ function Profile() {
             setFormData({
                 name: user.name || '',
                 email: user.email || '',
-                id: user.id || ''
+                id: user.id || '',
+                city: user?.cityName,
             });
         }
     }, [user]);
@@ -36,12 +38,11 @@ function Profile() {
         try {
             const currentUser = auth.currentUser;
             if (currentUser) {
-                await updateProfile(currentUser, { displayName: formData.name });
+                await updateProfile(currentUser, { displayName: formData.name, photoURL: formData?.city });
                 setTimeout(() => {
-                    console.log(currentUser, 'hello update User')
                     dispatch({
                         type: 'userData', payload: {
-                            name: currentUser?.displayName, email: currentUser?.email, id: currentUser?.uid
+                            name: currentUser?.displayName, email: currentUser?.email, id: currentUser?.uid, cityName: currentUser?.photoURL
                         }
                     })
                 }, 1000)
@@ -69,6 +70,16 @@ function Profile() {
                                             className='form-control bg-dark text-white'
                                             value={formData?.name}
                                             onChange={(e) => handleChange(e, 'name')}
+                                            placeholder='eg: John'
+                                            required
+                                        />
+                                    </div>
+                                    <div className='mt-3'>
+                                        <label className='form-label text-light m-0'>City*</label>
+                                        <input type="text"
+                                            className='form-control bg-dark text-white'
+                                            value={formData?.city}
+                                            onChange={(e) => handleChange(e, 'city')}
                                             placeholder='eg: John'
                                             required
                                         />
