@@ -41,9 +41,7 @@ function Dashboard() {
         }, 1000);
     }, [user]);
 
-    useEffect(() => {
-        handleGetFavrots()
-    }, [])
+    handleGetFavrots()
 
     useEffect(() => {
         let flag = 0;
