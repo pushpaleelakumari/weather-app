@@ -13,7 +13,6 @@ function Dashboard() {
     const [weatherData, setWeatherData] = useState(null);
     const [weatherbg, setWeatherBg] = useState(null);
     const [spinner, showSpinner] = useState(false)
-    const [bulkWeather, setBulkWeather] = useState(null)
 
     const handleGetFavrots = useCallback(async () => {
         try {
