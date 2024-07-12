@@ -153,14 +153,14 @@ function Dashboard() {
                             <input
                                 type="text"
                                 onChange={(e) => setSearch(e.target.value)}
-                                className={`form-control ${weatherbg ? 'bg-light text-dark' : 'text-white'} shadow`}
+                                className={`form-control text-white shadow`}
                                 placeholder="Enter city name"
-                                style={{ background: !weatherbg ? 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3))' : '' }}
+                                style={{ background: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3))' }}
                             />
                         </div>
                         <div className="col pt-md-0 pt-3">
                             <button
-                                className="py-2 px-0 btn text-center text-light"
+                                className="py-2 px-0 btn text-center text-light border border-light"
                                 onClick={() => handleSearch()}
                                 style={{ background: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3))' }}
                             >
