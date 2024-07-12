@@ -12,6 +12,9 @@ function Profile() {
         id: ''
     });
 
+    useEffect(() => {
+        handleGetData();
+    }, [user]);
 
     // eslint-disable-next-line
     const handleGetData = () => {
@@ -48,10 +51,6 @@ function Profile() {
             toast.error('Failed to update profile');
         }
     };
-
-    useEffect(() => {
-        handleGetData();
-    }, [user]);
 
     return (
         <section className='bg-dark text-light d-flex align-items-center' style={{ height: '90vh', width: '100%' }}>
