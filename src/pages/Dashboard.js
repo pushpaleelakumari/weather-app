@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,7 +14,7 @@ function Dashboard() {
     const [weatherbg, setWeatherBg] = useState(null);
     const [spinner, showSpinner] = useState(false);
 
-    const handleGetFavrots = useCallback(async () => {
+    const handleGetFavrots = async () => {
         try {
             if (user?.id) {
                 const q = query(collection(db, 'favorites'), where('userId', '==', user.id));
@@ -31,7 +31,7 @@ function Dashboard() {
             console.error('Error fetching favorites:', error);
             toast.error('Failed to fetch favorites');
         }
-    }, [user?.id, dispatch]);
+    }
 
     const handleSearch = async () => {
         console.log(search, 'hello search');
@@ -57,7 +57,7 @@ function Dashboard() {
 
     useEffect(() => {
         handleGetFavrots();
-    }, [handleGetFavrots]);
+    }, []);
 
     useEffect(() => {
         showSpinner(true);
@@ -144,7 +144,7 @@ function Dashboard() {
                         <div className="col pt-md-0 pt-3">
                             <button
                                 className="py-2 px-0 btn text-center text-light"
-                                onClick={handleSearch}
+                                onClick={() => handleSearch()}
                                 style={{ background: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3))' }}
                             >
                                 <b className="px-5">Search</b>
