@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase/Firebase';
-import Spinner from '../components/Spinner';
+import Spinner from '../components/spinner';
 
 function Login() {
     const navigate = useNavigate()

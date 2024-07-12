@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDoc, collection, db } from '../firebase/Firebase';
 import { getDocs, query, where } from 'firebase/firestore';
-import Spinner from '../components/Spinner';
+import Spinner from '../components/spinner';
 
 function Dashboard() {
     const dispatch = useDispatch()

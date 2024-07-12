@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase/Firebase';
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
 import toast from 'react-hot-toast';
-import Spinner from '../components/Spinner';
+import Spinner from '../components/spinner';
 
 function Signup() {
     const navigate = useNavigate();
