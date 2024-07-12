@@ -33,7 +33,7 @@ function Dashboard() {
         }
     }, [user?.id, dispatch]);
 
-    const handleSearch = useCallback(async () => {
+    const handleSearch = async () => {
         console.log(search, 'hello search');
         try {
             const response = await axios.get(
@@ -53,7 +53,7 @@ function Dashboard() {
             toast.error('Please provide a valid city name');
             showSpinner(false);
         }
-    }, [search, user?.cityName]);
+    };
 
     useEffect(() => {
         handleGetFavrots();
@@ -78,8 +78,8 @@ function Dashboard() {
                 setWeatherBg('/img/fog.png');
                 flag = 1;
             }
-            if (weatherData?.weather[0]?.main.includes('overcast')) {
-                setWeatherBg('/img/Rainy');
+            if (weatherData?.weather[0]?.description.includes('overcast')) {
+                setWeatherBg('/img/Rainy.jpg');
                 flag = 1;
             }
             if (flag === 0) {
@@ -170,7 +170,7 @@ function Dashboard() {
                                                     ? '🌤️ '
                                                     : weatherData?.weather[0]?.main.includes('haze')
                                                         ? '😶‍🌫️ '
-                                                        : weatherData?.weather[0]?.main.includes('overcast')
+                                                        : weatherData?.weather[0]?.description.includes('overcast')
                                                             ? '⛈️ '
                                                             : '🌤️ '}
                                                 {(weatherData.main.temp - 273.15).toFixed(2)}°
