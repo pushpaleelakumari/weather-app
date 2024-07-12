@@ -20,7 +20,7 @@ function Dashboard() {
             if (user?.cityName) {
                 try {
                     const response = await axios.get(
-                        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search || user?.cityName)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`
+                        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(user?.cityName)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`
                     );
 
                     if (response.status === 200 && response.data) {
@@ -40,8 +40,6 @@ function Dashboard() {
             else showSpinner(false);
         }, 1000);
     }, [user]);
-
-    handleGetFavrots()
 
     useEffect(() => {
         let flag = 0;
@@ -83,10 +81,12 @@ function Dashboard() {
         }
     };
 
+    handleGetFavrots()
+
     const handleSearch = async () => {
         try {
             const response = await axios.get(
-                `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search || user?.cityName)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`
+                `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`
             );
 
             if (response.status === 200 && response.data) {
