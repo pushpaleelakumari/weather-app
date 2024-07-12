@@ -80,7 +80,7 @@ function Profile() {
                                             className='form-control bg-dark text-white'
                                             value={formData?.city}
                                             onChange={(e) => handleChange(e, 'city')}
-                                            placeholder='eg: John'
+                                            placeholder='eg: new delhi'
                                             required
                                         />
                                     </div>
