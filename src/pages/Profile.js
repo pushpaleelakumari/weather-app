@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { updateProfile } from 'firebase/auth';
 import { auth } from '../firebase/Firebase';
 
 function Profile() {
+    const dispatch = useDispatch()
     const user = useSelector(state => state?.user_data);
     const [formData, setFormData] = useState({
         name: '',
@@ -13,11 +14,6 @@ function Profile() {
     });
 
     useEffect(() => {
-        handleGetData();
-    }, [user]);
-
-    // eslint-disable-next-line
-    const handleGetData = () => {
         if (user) {
             setFormData({
                 name: user.name || '',
@@ -25,10 +21,10 @@ function Profile() {
                 id: user.id || ''
             });
         }
-    };
+    }, [user]);
 
     const handleChange = (e, type) => {
-        setFormData((prev) => ({ ...prev, [type]: e.target.value }));
+        setFormData(prev => ({ ...prev, [type]: e.target.value }));
     };
 
     const handleUpdate = async () => {
@@ -41,8 +37,15 @@ function Profile() {
             const currentUser = auth.currentUser;
             if (currentUser) {
                 await updateProfile(currentUser, { displayName: formData.name });
+                setTimeout(() => {
+                    console.log(currentUser, 'hello update User')
+                    dispatch({
+                        type: 'userData', payload: {
+                            name: currentUser?.displayName, email: currentUser?.email, id: currentUser?.uid
+                        }
+                    })
+                }, 1000)
                 toast.success('Profile updated successfully');
-                // Optionally, update the local state or Redux store
             } else {
                 toast.error('No user is signed in');
             }
