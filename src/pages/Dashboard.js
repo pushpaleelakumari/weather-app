@@ -65,7 +65,7 @@ function Dashboard() {
             if (user?.cityName) handleSearch();
             else showSpinner(false);
         }, 1000);
-    }, [user, handleSearch]);
+    }, [user]);
 
     useEffect(() => {
         let flag = 0;
