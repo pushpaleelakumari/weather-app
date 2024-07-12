@@ -14,21 +14,21 @@ function TopNav() {
             await signOut(auth)
             dispatch({ type: 'userData', payload: '' })
             navigate('/')
+            window.location.reload()
         } catch (err) {
             console.log(err)
         }
     }
 
+    const handleGetHome = () => {
+        navigate('/')
+        window.location.reload()
+    }
+
     return (
         <nav className="navbar navbar-dark navbar-expand-lg" id="topnav">
             <div className="container">
-                <a
-                    className="navbar-brand me-auto"
-                    href="./index.html"
-                    previewlistener="true"
-                >
-                    <h2 className='p-0 m-0 shadow-bottom'><Link className='nav-link' to={'/'}><span className='fs-1'>🌤️</span> Weather App</Link></h2>
-                </a>
+                <h2 className='p-0 m-0 shadow-bottom text-white'><span className='cursor-pointer' onClick={() => handleGetHome()} ><span className='fs-1'>🌤️</span> Weather App</span></h2>
                 <form className="form-inline me-4 d-none d-lg-flex">
                 </form>
                 <div className='navbar-user'>

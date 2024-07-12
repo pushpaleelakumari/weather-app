@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDoc, collection, db } from '../firebase/Firebase';
 import { getDocs, query, where } from 'firebase/firestore';
+import Spinner from '../components/Spinner';
 
 function Dashboard() {
     const dispatch = useDispatch()
@@ -11,6 +12,8 @@ function Dashboard() {
     const [search, setSearch] = useState('');
     const [weatherData, setWeatherData] = useState(null);
     const [weatherbg, setWeatherBg] = useState(null);
+    const [spinner, showSpinner] = useState(false)
+    const [bulkWeather, setBulkWeather] = useState(null)
 
     const handleGetFavrots = useCallback(async () => {
         try {
@@ -36,6 +39,16 @@ function Dashboard() {
     }, [handleGetFavrots]);
 
     useEffect(() => {
+        showSpinner(true)
+        setTimeout(() => {
+            if (user?.cityName)
+                handleSearch()
+            else
+                showSpinner(false)
+        }, 1000)
+    }, [user])
+
+    useEffect(() => {
         let flag = 0;
         if (weatherData?.weather.length > 0) {
             if (weatherData?.weather[0]?.main.includes('cloud') && !weatherData?.weather[0]?.main.includes('overcast')) {
@@ -57,18 +70,22 @@ function Dashboard() {
     }, [weatherData]);
 
     const handleSearch = async () => {
+        console.log(search, 'hello search')
         try {
-            const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`);
+            const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search || user?.cityName)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`);
 
             if (response.status === 200 && response.data) {
-                toast.success('Got the weather data');
+                toast.success('Got the current weather data');
                 setWeatherData(response.data);
+                showSpinner(false)
             } else {
                 toast.error('Failed to fetch weather data');
+                showSpinner(false)
             }
         } catch (err) {
             console.error('Error fetching weather data:', err);
             toast.error('Please provide a valid city name');
+            showSpinner(false)
         }
     };
 
@@ -92,7 +109,7 @@ function Dashboard() {
                 // toast.error('Please login to add to favorites');
                 toast('Please login to add to favorites', {
                     icon: '⚠️',
-                  });
+                });
             }
         } catch (err) {
             console.error('Error adding to favorites:', err);
@@ -101,68 +118,78 @@ function Dashboard() {
     };
 
     return (
-        <div
-            className={`d-flex flex-column justify-content-center ${!weatherbg ? 'bg-dark' : ''}`}
-            style={{
-                height: '90vh',
-                background: weatherbg ? `url(${weatherbg})` : '#12263f',
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }}
-            key={weatherbg}
-        >
-            <div className="container">
-                <div className="text-center py-4 row align-items-center">
-                    <div className="col-md-10">
-                        <input type="text" onChange={(e) => setSearch(e.target.value)} className={`form-control ${weatherbg ? 'bg-light text-dark' : 'bg-dark text-white'} shadow`} placeholder="Enter city name" />
+        <Spinner show={spinner}>
+            <div
+                className={`d-flex flex-column justify-content-center `}
+                style={{
+                    height: '100vh',
+                    backgroundImage: weatherbg ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),url(${weatherbg})` : `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(${'/img/nature.jpg'})`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
+                key={weatherbg}
+            >
+                <div className="container">
+                    <div className="text-center py-4 row align-items-center">
+                        <div className="col-md-10">
+                            <input type="text" onChange={(e) => setSearch(e.target.value)} className={`form-control ${weatherbg ? 'bg-light text-dark' : 'text-white'} shadow`}
+                                placeholder="Enter city name"
+                                style={{ background: !weatherbg ? 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3))' : '' }}
+                            />
+                        </div>
+                        <div className="col pt-md-0 pt-3">
+                            <button className="py-2 px-0 btn text-center text-light"
+                                onClick={() => handleSearch()}
+                                style={{ background: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3))' }}
+                            >
+                                <b className='px-5'>Search</b>
+                            </button>
+                        </div>
                     </div>
-                    <div className="col pt-md-0 pt-3">
-                        <button className="py-2 px-0 form-control bg-light border-dark text-center" onClick={() => handleSearch()}><b>Search</b></button>
-                    </div>
-                </div>
-                {weatherData &&
-                    <section>
-                        <div className="row">
-                            <div className="col-md-6">
-                                <div className="border p-3 rounded" style={{ background: 'rgba(225,225,225,0.18)', boxShadow: ' 0 8px 32px 0 rgba(31,38,135,0.37)', backdropFilter: 'blur(3px)' }}>
-                                    <div className="">
-                                        <h1 className='text-light pb-2 m-0'>
-                                            {weatherData?.weather[0]?.main.includes('cloud') && !weatherData?.weather[0]?.main.includes('overcast') ?
-                                                '🌤️ ' : weatherData?.weather[0]?.main.includes("haze") ? '😶‍🌫️ ' : weatherData?.weather[0]?.main.includes('overcast') ? '⛈️ ' : '🌤️ '}
-                                            {(weatherData.main.temp - 273.15).toFixed(2)}°
-                                        </h1>
-                                        <h1 className='text-light pb-2 m-0'>
-                                            🍃 {weatherData?.wind?.speed} m/s
-                                        </h1>
-                                        <h1 className='m-0 text-light pb-2'>
-                                            🌈 {weatherData?.main?.humidity} %
-                                        </h1>
-                                        <h2 className='p-0 m-0 text-light'>
-                                            <img src="/img/location.png" height={30} width={35} alt="location" /> {weatherData?.name}, {weatherData?.sys?.country}
-                                        </h2>
+                    {weatherData &&
+                        <section>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <div className="border p-3 rounded" style={{ background: 'rgba(225,225,225,0.18)', boxShadow: ' 0 8px 32px 0 rgba(31,38,135,0.37)', backdropFilter: 'blur(3px)' }}>
+                                        <div className="">
+                                            <h1 className='text-light pb-2 m-0'>
+                                                {weatherData?.weather[0]?.main.includes('cloud') && !weatherData?.weather[0]?.main.includes('overcast') ?
+                                                    '🌤️ ' : weatherData?.weather[0]?.main.includes("haze") ? '😶‍🌫️ ' : weatherData?.weather[0]?.main.includes('overcast') ? '⛈️ ' : '🌤️ '}
+                                                {(weatherData.main.temp - 273.15).toFixed(2)}°
+                                            </h1>
+                                            <h1 className='text-light pb-2 m-0'>
+                                                🍃 {weatherData?.wind?.speed} m/s
+                                            </h1>
+                                            <h1 className='m-0 text-light pb-2'>
+                                                🌈 {weatherData?.main?.humidity} %
+                                            </h1>
+                                            <h2 className='p-0 m-0 text-light'>
+                                                <img src="/img/location.png" height={30} width={35} alt="location" /> {weatherData?.name}, {weatherData?.sys?.country}
+                                            </h2>
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="col-md-6 pt-md-0 pt-3">
+                                    <iframe
+                                        title="weather-map"
+                                        frameBorder="0"
+                                        className='rounded h-100 w-100'
+                                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${weatherData.coord.lon - 0.05},${weatherData.coord.lat - 0.05},${weatherData.coord.lon + 0.05},${weatherData.coord.lat + 0.05}&layer=mapnik&marker=${weatherData.coord.lat},${weatherData.coord.lon}`}
+                                        allowFullScreen
+                                        style={{ boxShadow: ' 0 8px 32px 0 rgba(31,38,135,0.37)' }}
+                                    >
+                                    </iframe>
+                                </div>
+                                <div className="text-center mt-3">
+                                    <button className='btn btn-primary' onClick={() => handleAddToFav()}>Add to favorites</button>
+                                </div>
                             </div>
-                            <div className="col-md-6 pt-md-0 pt-3">
-                                <iframe
-                                    title="weather-map"
-                                    frameBorder="0"
-                                    className='rounded h-100 w-100'
-                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${weatherData.coord.lon - 0.05},${weatherData.coord.lat - 0.05},${weatherData.coord.lon + 0.05},${weatherData.coord.lat + 0.05}&layer=mapnik&marker=${weatherData.coord.lat},${weatherData.coord.lon}`}
-                                    allowFullScreen
-                                    style={{ boxShadow: ' 0 8px 32px 0 rgba(31,38,135,0.37)' }}
-                                >
-                                </iframe>
-                            </div>
-                            <div className="text-center mt-3">
-                                <button className='btn btn-primary' onClick={() => handleAddToFav()}>Add to favorites</button>
-                            </div>
-                        </div>
-                    </section>
-                }
+                        </section>
+                    }
+                </div>
             </div>
-        </div>
+        </Spinner>
     );
 }
 

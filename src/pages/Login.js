@@ -4,10 +4,12 @@ import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase/Firebase';
+import Spinner from '../components/Spinner';
 
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const [spinner, showSpinner] = useState(false)
     const [password, showPassword] = useState(false)
     const [formData, setFormData] = useState({
         email: '',
@@ -16,26 +18,33 @@ function Login() {
 
     const handleSignin = async () => {
         try {
+            showSpinner(true)
             let userData = ''
             if (formData?.email && formData?.password) {
                 userData = await signInWithEmailAndPassword(auth, formData?.email, formData?.password);
-                console.log(userData?.user?.emailVerified, 'hello user data')
                 if (userData?.user?.emailVerified) {
-                    console.log(userData?.user)
                     dispatch({
                         type: 'userData', payload: {
-                            name: userData?.user?.displayName, email: userData?.user?.email, id: userData?.user?.uid
+                            name: userData?.user?.displayName,
+                            email: userData?.user?.email,
+                            id: userData?.user?.uid,
+                            cityName: userData?.user?.photoURL
                         }
                     })
                     navigate('/')
                     toast.success('Logged in successfully')
+                    showSpinner(false)
                 } else {
-                    toast.error('User not verified please check your email')
+                    toast('User not verified please check your email', {
+                        icon: '⚠️',
+                    });
+                    showSpinner(false)
                 }
             }
         } catch (err) {
             console.log(err)
             toast.error('invalid username/password')
+            showSpinner(false)
         }
     }
 
@@ -83,9 +92,11 @@ function Login() {
                                 </span>
                             </div>
                         </div>
-                        <button className="btn btn-lg w-100 btn-primary mb-3" onClick={() => handleSignin()}>
-                            Sign in
-                        </button>
+                        <Spinner show={spinner}>
+                            <button className="btn btn-lg w-100 btn-primary mb-3" onClick={() => handleSignin()}>
+                                Sign in
+                            </button>
+                        </Spinner>
                         <p className="text-center">
                             <small className="text-body-secondary text-center">
                                 Don't have an account yet?{" "}

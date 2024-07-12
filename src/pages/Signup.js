@@ -3,16 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase/Firebase';
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
 import toast from 'react-hot-toast';
+import Spinner from '../components/Spinner';
 
 function Signup() {
     const navigate = useNavigate();
     const [password, showPassword] = useState(false)
     const [confirmPassword, showConfirmPassword] = useState(false)
+    const [spinner, showSpinner] = useState(false)
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        confirm_password: ''
+        confirm_password: '',
+        city: ''
     });
 
     const handleChange = (e, type) => {
@@ -21,6 +24,7 @@ function Signup() {
 
     const handleSignup = async () => {
         try {
+            showSpinner(true)
             if (formData.email && formData.name && formData.password) {
                 if (formData.password === formData.confirm_password) {
                     const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
@@ -28,7 +32,8 @@ function Signup() {
 
                     // Update the profile to set the display name
                     await updateProfile(user, {
-                        displayName: formData.name
+                        displayName: formData.name,
+                        photoURL: formData.city
                     });
 
                     // Send email verification
@@ -36,13 +41,16 @@ function Signup() {
                     await signOut(auth)
                     toast.success('User created successfully. Please verify your email.');
                     navigate('/login');
+                    showSpinner(false)
                 } else {
                     toast.error('Password and confirm password must be the same');
+                    showSpinner(false)
                 }
             }
         } catch (err) {
             console.error(err);
             toast.error(err.message.includes('email-already-in-use') ? 'email already exist' : '');
+            showSpinner(false)
         }
     };
 
@@ -64,6 +72,17 @@ function Signup() {
                                 required
                                 value={formData.name}
                                 onChange={(e) => handleChange(e, 'name')}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label m-0">City<b className='text-danger'>*</b></label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="eg: John"
+                                required
+                                value={formData.city}
+                                onChange={(e) => handleChange(e, 'city')}
                             />
                         </div>
                         <div className="form-group">
@@ -100,7 +119,7 @@ function Signup() {
                         <div className="form-group">
                             <div className="row">
                                 <div className="col">
-                                    <label className="form-label m-0">Confirm password</label>
+                                    <label className="form-label m-0">Confirm password<b className='text-danger'>*</b></label>
                                 </div>
                             </div>
                             <div className="input-group input-group-merge">
@@ -117,9 +136,11 @@ function Signup() {
                                 </span>
                             </div>
                         </div>
-                        <button className="btn btn-lg w-100 btn-primary mb-3" onClick={handleSignup}>
-                            Sign up
-                        </button>
+                        <Spinner show={spinner}>
+                            <button className="btn btn-lg w-100 btn-primary mb-3" onClick={handleSignup}>
+                                Sign up
+                            </button>
+                        </Spinner>
                         <p className="text-center">
                             <small className="text-body-secondary text-center">
                                 Already have an account?{" "}
