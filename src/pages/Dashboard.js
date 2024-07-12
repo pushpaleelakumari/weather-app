@@ -14,31 +14,28 @@ function Dashboard() {
     const [weatherbg, setWeatherBg] = useState(null);
     const [spinner, showSpinner] = useState(false);
 
-    useEffect(() => {
-        const handleGetFavrots = async () => {
-            try {
-                if (user?.id) {
-                    const q = query(collection(db, 'favorites'), where('userId', '==', user.id));
-                    const querySnapshot = await getDocs(q);
-                    const favoriteList = [];
-                    querySnapshot.forEach((doc) => {
-                        favoriteList.push(doc.data());
-                    });
-                    dispatch({ type: 'favorites', payload: favoriteList });
-                } else {
-                    dispatch({ type: 'favorites', payload: '' });
-                }
-            } catch (error) {
-                console.error('Error fetching favorites:', error);
-                toast.error('Failed to fetch favorites');
+    const handleGetFavrots = async () => {
+        try {
+            if (user?.id) {
+                const q = query(collection(db, 'favorites'), where('userId', '==', user.id));
+                const querySnapshot = await getDocs(q);
+                const favoriteList = [];
+                querySnapshot.forEach((doc) => {
+                    favoriteList.push(doc.data());
+                });
+                dispatch({ type: 'favorites', payload: favoriteList });
+            } else {
+                dispatch({ type: 'favorites', payload: '' });
             }
-        };
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+            toast.error('Failed to fetch favorites');
+        }
+    };
 
-        handleGetFavrots();
-    }, [user?.id, dispatch]);
+    handleGetFavrots();
 
     const handleSearch = async () => {
-        console.log(search, 'hello search');
         try {
             const response = await axios.get(
                 `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search || user?.cityName)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`
