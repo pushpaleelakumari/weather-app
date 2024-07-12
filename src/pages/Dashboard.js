@@ -14,6 +14,58 @@ function Dashboard() {
     const [weatherbg, setWeatherBg] = useState(null);
     const [spinner, showSpinner] = useState(false);
 
+    useEffect(() => {
+        showSpinner(true);
+        setTimeout(async () => {
+            if (user?.cityName) {
+                try {
+                    const response = await axios.get(
+                        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(search || user?.cityName)}&appid=${process.env.REACT_APP_WEATHER_API_KEY}`
+                    );
+
+                    if (response.status === 200 && response.data) {
+                        toast.success('Got the current weather data');
+                        setWeatherData(response.data);
+                        showSpinner(false);
+                    } else {
+                        toast.error('Failed to fetch weather data');
+                        showSpinner(false);
+                    }
+                } catch (err) {
+                    console.error('Error fetching weather data:', err);
+                    toast.error('Please provide a valid city name');
+                    showSpinner(false);
+                }
+            }
+            else showSpinner(false);
+        }, 1000);
+    }, [user]);
+
+    useEffect(() => {
+        handleGetFavrots()
+    }, [])
+
+    useEffect(() => {
+        let flag = 0;
+        if (weatherData?.weather.length > 0) {
+            if (weatherData?.weather[0]?.main.includes('cloud') && !weatherData?.weather[0]?.main.includes('overcast')) {
+                setWeatherBg('/img/Clear.jpg');
+                flag = 1;
+            }
+            if (weatherData?.weather[0]?.main.includes('haze')) {
+                setWeatherBg('/img/fog.png');
+                flag = 1;
+            }
+            if (weatherData?.weather[0]?.description.includes('overcast')) {
+                setWeatherBg('/img/Rainy.jpg');
+                flag = 1;
+            }
+            if (flag === 0) {
+                setWeatherBg('/img/Clear.jpg');
+            }
+        }
+    }, [weatherData]);
+
     const handleGetFavrots = async () => {
         try {
             if (user?.id) {
@@ -32,8 +84,6 @@ function Dashboard() {
             toast.error('Failed to fetch favorites');
         }
     };
-
-    handleGetFavrots();
 
     const handleSearch = async () => {
         try {
@@ -56,34 +106,6 @@ function Dashboard() {
         }
     };
 
-    useEffect(() => {
-        showSpinner(true);
-        setTimeout(() => {
-            if (user?.cityName) handleSearch();
-            else showSpinner(false);
-        }, 1000);
-    }, [user]);
-
-    useEffect(() => {
-        let flag = 0;
-        if (weatherData?.weather.length > 0) {
-            if (weatherData?.weather[0]?.main.includes('cloud') && !weatherData?.weather[0]?.main.includes('overcast')) {
-                setWeatherBg('/img/Clear.jpg');
-                flag = 1;
-            }
-            if (weatherData?.weather[0]?.main.includes('haze')) {
-                setWeatherBg('/img/fog.png');
-                flag = 1;
-            }
-            if (weatherData?.weather[0]?.description.includes('overcast')) {
-                setWeatherBg('/img/Rainy.jpg');
-                flag = 1;
-            }
-            if (flag === 0) {
-                setWeatherBg('/img/Clear.jpg');
-            }
-        }
-    }, [weatherData]);
 
     const handleAddToFav = async () => {
         try {
