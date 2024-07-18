@@ -52,7 +52,7 @@ function Dashboard() {
                 setWeatherBg('/img/fog.png');
                 flag = 1;
             }
-            if (weatherData?.weather[0]?.description.includes('overcast')) {
+            if (weatherData?.weather[0]?.description.includes('overcast') || weatherData?.weather[0]?.description.includes('rain')) {
                 setWeatherBg('/img/Rainy.jpg');
                 flag = 1;
             }
@@ -187,7 +187,7 @@ function Dashboard() {
                                                     ? '🌤️ '
                                                     : weatherData?.weather[0]?.main.includes('haze')
                                                         ? '😶‍🌫️ '
-                                                        : weatherData?.weather[0]?.description.includes('overcast')
+                                                        : (weatherData?.weather[0]?.description.includes('overcast') || weatherData?.weather[0]?.description.includes('rain'))
                                                             ? '⛈️ '
                                                             : '🌤️ '}
                                                 {(weatherData.main.temp - 273.15).toFixed(2)}°
